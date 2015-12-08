@@ -10,7 +10,7 @@ var
 
 
 var path = {
-    scss: 'src/scss/*.scss',
+    scss:[ 'src/scss/*.scss','src/sass/*.scss'],
     css: 'app/css',
     jade: 'src/jade/*.jade'
 };

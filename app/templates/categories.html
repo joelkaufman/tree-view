@@ -1,0 +1,7 @@
+<h2>
+    <span ng-repeat="crumb in breadCrumbs" ng-click="setLevel($index +1)">{{crumb.Name}} / </span>
+</h2>
+
+<ul class="categories">
+    <li class="category-root" ng-repeat="category in categories" category="category"></li>
+</ul>

@@ -1,22 +1,31 @@
-<html>
+<html ng-app="app">
 
 <head>
     <title>My Web Page</title>
     <link rel="stylesheet" href="/css/main.css" />
 </head>
 
-<body>
-    <br/>
-    <br/>
-    <div class="container">
-        <div class="jumbotron">
-            <h1>Hello, world!</h1>
-            <p>...</p>
-            <p><a href="#" role="button" class="btn btn-primary btn-lg">learn more</a>
-            </p>
-        </div>
-    </div>
-    <script src="/js/dev.js" type="text/javascript"></script>
+<body  ng-controller="test">
+
+<button ng-click="remove()">Remove Children</button>
+<br>
+
+<form ng-submit="add()">
+    <input type="text" ng-model="child">
+    <input type="submit" value="add Children"/>
+</form>
+<h2 ng-if="!myCategory.children">{{myCategory.Name}}</h2>
+
+<div categories="data" category-model="myCategory">
+   <p>ID: {{category.ID}}</p>
+</div>
+
+<script src="/libs/angular/angular.js"></script>
+
+
+<script src="/js/main.js"></script>
+<script src="js/mock.js"></script>
+<script src="/js/dev.js" type="text/javascript"></script>
 </body>
 
 </html>
