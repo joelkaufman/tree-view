@@ -26,7 +26,7 @@
             '</ul>',
 
         category:
-            '<li ng-class="{\'category-leaf\': ! category.children}" ng-click="select($event)"><div class="category-name">{{ category.Name }}</div></li>',
+            '<li ng-class="{\'category-leaf\': ! category.children}" ng-click="select($event)"></li>',
 
         categoryChildren:
             '<ul>' +
