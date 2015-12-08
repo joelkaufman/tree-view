@@ -7,39 +7,85 @@
 
     var $ = angular.element;
 
+
+    var tmpl = function(str){
+        // Figure out if we're getting a template, or if we need to
+        // load the template - and be sure to cache the result.
+        var fn = new Function("obj",
+                "var p=[],print=function(){p.push.apply(p,arguments);};" +
+
+                    // Introduce the data as local variables using with(){}
+                "with(obj){p.push('" +
+
+                    // Convert the template into pure JavaScript
+                str
+                    .replace(/[\r\t\n]/g, " ")
+                    .split("<%").join("\t")
+                    .replace(/((^|%>)[^\t]*)'/g, "$1\r")
+                    .replace(/\t=(.*?)%>/g, "',$1,'")
+                    .split("\t").join("');")
+                    .split("%>").join("p.push('")
+                    .split("\r").join("\\'")
+                + "');}return p.join('');");
+
+        // Provide some basic currying to the user
+        return fn;
+    };
+
+
+
     String.prototype.isEmpty = function() {
         return (this.length === 0 || !this.trim());
     };
 
     ng.module(mod, [])
-        .directive("categories", categories)
-        .directive("category", category)
+        .directive("treeView", treeView)
+        .directive("treeItem", treeItem)
     ;
 
     var tpl = {
-        categories:
+        treeView: tmpl(
             '<h2>'+
             '   <span ng-repeat="crumb in breadCrumbs" ng-click="setLevel($index +1)">{{crumb.Name}} / </span>'+
             '</h2>'+
-            '<ul class="categories">'+
-            '   <li class="category-root" ng-repeat="category in categories" category="category"></li>'+
-            '</ul>',
+            '<ul class="tree-view">'+
+            '   <li class="item-root" ng-repeat="item in treeView" tree-item="item" children-name="<%= children %>" item-name="<%= item %>"></li>'+
+            '</ul>'),
 
-        category:
-            '<li ng-class="{\'category-leaf\': ! category.children}" ng-click="select($event)"></li>',
+        treeItem:tmpl(
+            "<li ng-class=\"{\\'item-leaf\': ! item.<%= children %>}\" ng-click=\"select($event)\"></li>"),
 
-        categoryChildren:
+        itemChildren:tmpl(
             '<ul>' +
-            '   <li ng-repeat="category in category.children" category="category"></li>' +
-            '</ul>'
+            '   <li ng-repeat="<%= item %> in <%= item %>.<%= children %>" children-name="<%= children %>" item-name="<%= item %>"  tree-item="<%= item %>"></li>' +
+            '</ul>')
     };
 
 
-    function categories(){
+    function treeView(){
 
         function compile(el, attrs){
+
+            var item = 'item';
+            var children = 'children';
+
+            if(attrs.treeScope){
+                var expression = attrs.treeScope;
+
+                var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)??\s*$/);
+
+                if (!match) {
+                    throw ('tree-scope usage tree-view="item in items.children"\ntree-scope="' + attrs.treeScope + '" was given !\n');
+                }
+
+                item = match[1];
+                children = match[2];
+            }
+
+            var template = tpl.treeView({item: item, children: children});
+
             attrs.$template = el.html();
-            el.html(tpl.categories);
+            el.html(template);
             return ng.noop;
         }
 
@@ -53,7 +99,7 @@
             };
 
             this.getSelected = function(){
-                return $scope.categoryModel;
+                return $scope.treeModel;
             };
 
             this.reset = function(){
@@ -78,7 +124,7 @@
                     ctrl.selectEl(i == controllers.length -1);
                 });
 
-                $scope.categoryModel = $scope.breadCrumbs[$scope.breadCrumbs.length -1];
+                $scope.treeModel = $scope.breadCrumbs[$scope.breadCrumbs.length -1];
             };
 
 
@@ -98,42 +144,37 @@
         }
 
         return {
-            template:angular.noop,
-            scope: {
-                categories:"=",
-                categoryModel: '=',
-                breadCrumbs:'=',
-            },
+            template:ng.noop,
             compile: compile,
-            controller: controller
+            controller: controller,
+            restrict:'A',
+            scope:{
+                treeView: '=',
+                treeModel:'='
+            }
         };
     }
 
 
 
 
-    function category($compile){
+    function treeItem($compile){
 
-        var template =
-            '<li ng-class="{\'category-leaf\': ! category.children}" ng-click="select($event)"><div class="category-name">{{ category.Name }}</div></li>';
+        function getTemplate(el, attrs){
+            return tpl.treeItem({item:attrs.itemName , children:attrs.childrenName});
+        }
 
-        var childrenTemplate =
-            '<ul>' +
-            '   <li ng-repeat="category in category.children" category="category"></li>' +
-            '</ul>';
-
-
-        function controller($scope, $element)
+        function controller($scope, $element, $attrs)
         {
-            var categoriesCtrl= $element.controller('categories');
-            var parentCtrl = $element.parent().controller('category');
+            var treeViewCtrl= $element.controller('treeView');
+            var parentCtrl = $element.parent().controller('treeItem');
 
             this.select = function(reset){
-                categoriesCtrl.addSelected($scope.category, this, reset);
+                treeViewCtrl.addSelected($scope[$attrs.itemName], this, reset);
                 if(parentCtrl){
                     parentCtrl.select();
                 }else{
-                    categoriesCtrl.select();
+                    treeViewCtrl.select();
                 }
             };
 
@@ -150,16 +191,15 @@
                 if(e.defaultPrevented) return;
                 e.preventDefault();
 
-                categoriesCtrl.onRemoveCategory($scope.category);
+                treeViewCtrl.onRemoveCategory($scope[$attrs.itemName]);
             });
         }
 
-
         function link(scope, el, attrs, ctrl)
         {
-            var categoriesCtrl= el.controller('categories');
+            var treeViewCtrl= el.controller('treeView');
 
-            var customTemplate = categoriesCtrl.getTemplate();
+            var customTemplate = treeViewCtrl.getTemplate();
 
             if(! customTemplate.isEmpty()){
                 customTemplate =  $(customTemplate);
@@ -167,11 +207,11 @@
                 $compile(customTemplate)(scope);
             }
 
-            var $el = $(tpl.categoryChildren);
+            var $el = $(tpl.itemChildren({item:attrs.itemName, children:attrs.childrenName}));
             el.append($el);
             $compile($el)(scope);
 
-            if(categoriesCtrl.getSelected() == scope.category) ctrl.select(true);
+            if(treeViewCtrl.getSelected() == scope.category) ctrl.select(true);
 
             scope.select = function($event){
                 $event.stopPropagation();
@@ -180,13 +220,11 @@
         }
 
         return {
-            template: tpl.category,
-            replace: true,
-            require:'category',
+            template:getTemplate,
+            require:'treeItem',
             controller: controller,
-            scope: {
-                category: '='
-            },
+            scope:true,
+            replace: true,
             link: link
         };
     }

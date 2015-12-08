@@ -16,8 +16,8 @@
 </form>
 <h2 ng-if="!myCategory.children">{{myCategory.Name}}</h2>
 
-<div categories="data" category-model="myCategory">
-    <div class="category-name">{{ category.Name }}</div>
+<div tree-view="data" tree-model="myCategory">
+    <div class="category-name">{{ item.Name }}</div>
 </div>
 
 <script src="/libs/angular/angular.js"></script>
