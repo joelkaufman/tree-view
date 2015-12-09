@@ -49,7 +49,7 @@
             '   <span ng-repeat="crumb in breadCrumbs" ng-click="setLevel($index +1)">{{crumb.Name}} / </span>'+
             '</h2>'+
             '<ul class="tree-view">'+
-            '   <li class="item-root" ng-repeat="item in treeView" tree-item="item" children-name="<%= children %>" item-name="<%= item %>"></li>'+
+            '   <li class="item-root" ng-repeat="<%= item %> in treeView" tree-item="<%= item %>" children-name="<%= children %>" item-name="<%= item %>"></li>'+
             '</ul>'),
 
         treeItem:tmpl(
@@ -57,7 +57,7 @@
 
         itemChildren:tmpl(
             '<ul>' +
-            '   <li ng-repeat="<%= item %> in <%= item %>.<%= children %>" children-name="<%= children %>" item-name="<%= item %>"  tree-item="<%= item %>"></li>' +
+            '   <li ng-repeat="<%= item %> in <%= children %>" children-name="<%= children %>" item-name="<%= item %>"  tree-item="<%= item %>"></li>' +
             '</ul>')
     };
 
@@ -67,7 +67,7 @@
         function compile(el, attrs){
 
             var item = 'item';
-            var children = 'children';
+            var children = 'item.children';
 
             if(attrs.treeScope){
                 var expression = attrs.treeScope;
@@ -223,7 +223,6 @@
             template:getTemplate,
             require:'treeItem',
             controller: controller,
-            scope:true,
             replace: true,
             link: link
         };
