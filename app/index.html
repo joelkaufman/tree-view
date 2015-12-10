@@ -2,23 +2,27 @@
 
 <head>
     <title>My Web Page</title>
+    <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/main.css" />
 </head>
 
-<body  ng-controller="test">
-
-<button ng-click="remove()">Remove Children</button>
+<body  ng-controller="test" class="container">
+<br>
 <br>
 
-<form ng-submit="add()">
-    <input type="text" ng-model="child">
-    <input type="submit" value="add Children"/>
-</form>
-<h2 ng-if="!myCategory.children">{{myCategory.Name}}</h2>
 
-<div tree-view="data" tree-model="myCategory" tree-scope="test in test.children">
-    <div class="category-name">{{ test.Name }}</div>
-</div>
+
+<h3 ng-if="! vm.editMode">{{ vm.fault.Name}} <button class="btn btn-primary" ng-click="vm.editMode = true">
+    <span class="glyphicon glyphicon glyphicon-pencil"></span>
+    Edit
+</button></h3>
+
+<span >
+    <div ng-if="vm.editMode" class="options-tree" tree-view="data" tree-model="vm.fault" tree-scope="option in option.children">
+        <div class="option-name">{{ option.Name }}</div>
+    </div>
+</span>
+
 
 <script src="/libs/angular/angular.js"></script>
 

@@ -39,25 +39,24 @@
     }
 
     angular.module('app').controller('test',function($scope){
+
         $scope.data = getNestedChildren(test,null);
+        $scope.editMode = true;
+        var vm  = $scope.vm  = {
+            fault:false,
+            editMode:true
+        };
+
         window.test = $scope.data;
 
 
-        $scope.myCategory =  $scope.data[0].children[1];
-
-        $scope.remove = function(){
-            $scope.data[1].children[1].children.pop()
-        };
-
-
-
-        $scope.add = function(){
-            $scope.data[0].children.push({
-                Name: $scope.child
-            });
-
-            $scope.child = '';
+        function onSelectItem(){
+            if(vm.fault && ! vm.fault.children){
+                vm.editMode = false;
+            }
         }
+
+        $scope.$watch('vm.fault',onSelectItem);
 
     });
 

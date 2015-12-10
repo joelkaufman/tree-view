@@ -45,19 +45,19 @@
 
     var tpl = {
         treeView: tmpl(
-            '<h2>'+
-            '   <span ng-repeat="crumb in breadCrumbs" ng-click="setLevel($index +1)">{{crumb.Name}} / </span>'+
-            '</h2>'+
+            //'<h2>'+
+            //'   <span ng-repeat="crumb in breadCrumbs" ng-click="setLevel($index +1)">{{crumb.Name}} / </span>'+
+            //'</h2>'+
             '<ul class="tree-view">'+
-            '   <li class="item-root" ng-repeat="<%= item %> in treeView" tree-item="<%= item %>" children-name="<%= children %>" item-name="<%= item %>"></li>'+
+            '   <li class="item-root" ng-repeat="<%= item %> in treeView track by $index" tree-item="<%= item %>" children-name="<%= children %>" item-name="<%= item %>"></li>'+
             '</ul>'),
 
         treeItem:tmpl(
-            "<li ng-class=\"{\\'item-leaf\': ! item.<%= children %>}\" ng-click=\"select($event)\"></li>"),
+            "<li ng-class=\"{\\'item-leaf\': ! <%= children %>}\" ng-click=\"select($event)\"></li>"),
 
         itemChildren:tmpl(
-            '<ul>' +
-            '   <li ng-repeat="<%= item %> in <%= children %>" children-name="<%= children %>" item-name="<%= item %>"  tree-item="<%= item %>"></li>' +
+            '<ul ng-if="<%= children %>">' +
+            '   <li ng-repeat="<%= item %> in <%= children %> track by $index " children-name="<%= children %>" item-name="<%= item %>"  tree-item="<%= item %>"></li>' +
             '</ul>')
     };
 
@@ -211,7 +211,7 @@
             el.append($el);
             $compile($el)(scope);
 
-            if(treeViewCtrl.getSelected() == scope.category) ctrl.select(true);
+            if(treeViewCtrl.getSelected() == scope[attrs.itemName]) ctrl.select(true);
 
             scope.select = function($event){
                 $event.stopPropagation();

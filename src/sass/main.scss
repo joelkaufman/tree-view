@@ -1,61 +1,149 @@
-//$icon-font-path:"/libs/bootstrap-sass/assets/fonts/bootstrap/";
-//@import "../../app/libs/bootstrap-sass/assets/stylesheets/bootstrap";
-
-
-li ul{
-  display: block;
+.glyphicon{
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-.categories{
-  border: 1px solid gray;
-  padding: 0;
 
-  .selected > .category-name{
-    background: pink;
+.glyphicon-chevron-right:before {
+  content: "\e080";
+}
+
+.glyphicon-chevron-down:before {
+  content: "\e114";
+}
+
+.glyphicon-triangle-right{
+  content: "\e250";
+}
+
+.glyphicon-triangle-bottom{
+  content: "\e252";
+}
+
+
+.options-tree{
+
+  width: 500px;
+
+  li,ul{
+
+    list-style: none;
+    display: block;
+    font-weight: 400;
+    color: black;
+    overflow: hidden;
+    margin:0;
+    padding:0;
   }
-  .category-root{
-    margin-left: -1px;
-    margin-right: -1px;
-    margin-top: -1px;
-    margin-bottom: -1px;
-    max-height: 9999px;
+
+  ul{
+    max-height: 0;
+  }
+
+  & > ul{
+    max-height: 99999px;
+  }
+
+  .item-root > .option-name {
+
+    border: 1px solid #ddd;
+    padding:15px;
+    padding-left: 30px;
+
+    font-size: 1.2em;
     position: relative;
-    transition: max-height 1s;
 
 
-    > .category-name{
-      border: 1px solid gray;
-      padding: 15px;
-    }
+    &:before{
+      @extend .glyphicon;
+      @extend .glyphicon-chevron-right;
 
-    &.expand > .category-name{
-      color: green;
-      font-weight: bold;
-    }
-
-    &:after{
-      content: ">";
-      font-weight: bold;
-      font-size: 20px;
-      font-family: Verdana;
       position: absolute;
       right: 15px;
-      top:10px;
-    }
-
-    &.expand:after{
-      -webkit-transform:rotate(90deg);
+      top:18px
     }
   }
 
-  li{
-    overflow: hidden;
-    max-height: 0px;
-    transition:all .5s;
-
+  .item-root.expand > .option-name{
+    color: green;
+    font-weight: bold;
+    margin-top: 0px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    cursor: default;
+    &:before{
+      @extend .glyphicon-chevron-down;
+      right: -25px;
+    }
   }
 
-  .expand > ul >li{
+  .item-root.expand{
+    border: 1px solid #ddd;
+    padding-right: 40px;
+  }
+
+  .expand > ul{
     max-height: 9999px;
   }
+
+
+  .option-name{
+    cursor: pointer;
+  }
+
+  .expand > .option-name{
+    cursor: default;
+  }
+
+  li > ul{
+
+    margin-right: -40px;
+  }
+
+
+  li > ul > li {
+
+    padding-left: 30px;
+    padding-top: 5px;
+
+    .option-name{
+      font-size: 1.1em;
+    }
+
+    &:before{
+      @extend .glyphicon;
+      @extend .glyphicon-triangle-right;
+      left: -20px;
+      top:15px;
+    }
+
+    &.expand:before{
+      @extend .glyphicon;
+      @extend .glyphicon-triangle-bottom;
+      top:15px;
+    }
+
+    &.expand:not(.item-leaf){
+      color: green;
+      background: #f0f0f0;
+    }
+
+
+    &.item-leaf:before{
+      content: '';
+    }
+
+    &.item-leaf .option-name{
+      font-size: .9em;
+    }
+
+  }
+
 
 }
